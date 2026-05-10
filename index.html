@@ -105,6 +105,58 @@ body::before{
 }
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
 
+/* ── Download button ── */
+.hero-download{margin-top:36px}
+.btn-download{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 40px;border:2px solid var(--accent);border-radius:4px;
+  background:transparent;color:var(--accent);font-family:'Noto Sans SC',sans-serif;
+  font-size:16px;font-weight:700;letter-spacing:.15em;cursor:pointer;
+  transition:background .3s,box-shadow .3s,transform .2s;
+  text-decoration:none;
+}
+.btn-download:hover{
+  background:rgba(232,148,58,.12);
+  box-shadow:0 0 20px rgba(232,148,58,.25);
+  transform:translateY(-2px);
+}
+.btn-download .icon-download{font-size:20px}
+
+/* ── QR Modal ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+  justify-content:center;align-items:center;
+}
+.modal-overlay.active{display:flex}
+.modal-box{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:40px;text-align:center;max-width:360px;width:90%;
+  box-shadow:0 0 60px rgba(232,148,58,.1);
+  animation:modalIn .3s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.modal-box h3{
+  font-family:'Orbitron',sans-serif;font-size:18px;color:var(--accent);
+  letter-spacing:.1em;margin-bottom:8px;
+}
+.modal-box .modal-desc{font-size:14px;color:var(--dim);margin-bottom:24px;line-height:1.8}
+.modal-box .qr-wrapper{
+  background:#fff;padding:12px;border-radius:8px;display:inline-block;margin-bottom:20px;
+}
+.modal-box .qr-wrapper canvas{display:block}
+.modal-box .group-num{
+  font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--accent);
+  letter-spacing:.2em;margin-bottom:20px;
+}
+.modal-box .group-label{font-size:13px;color:var(--dim);margin-bottom:6px}
+.modal-close{
+  padding:10px 32px;border:1px solid var(--dim);border-radius:4px;
+  background:transparent;color:var(--dim);font-size:13px;cursor:pointer;
+  letter-spacing:.1em;transition:border-color .3s,color .3s;
+}
+.modal-close:hover{border-color:var(--accent);color:var(--accent)}
+
 /* ── Nav ── */
 .nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
@@ -501,6 +553,11 @@ body::before{
     <div class="stat"><span class="num">15+</span><span class="label">可获战车</span></div>
     <div class="stat"><span class="num">12</span><span class="label">主要城镇</span></div>
     <div class="stat"><span class="num">∞</span><span class="label">可玩性</span></div>
+  </div>
+  <div class="hero-download">
+    <button class="btn-download" onclick="document.getElementById('qrModal').classList.add('active')">
+      <span class="icon-download">⬇</span>下载游戏
+    </button>
   </div>
   <div class="hero-scroll">▼</div>
 </section>
@@ -1024,7 +1081,50 @@ body::before{
   </p>
 </footer>
 
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal-box">
+    <h3>下载游戏</h3>
+    <p class="modal-desc">扫描下方二维码加入QQ群<br>在群文件中下载游戏</p>
+    <div class="qr-wrapper"><canvas id="qrCanvas"></canvas></div>
+    <div class="group-label">QQ群号</div>
+    <div class="group-num">1004606342</div>
+    <button class="modal-close" onclick="document.getElementById('qrModal').classList.remove('active')">关闭</button>
+  </div>
+</div>
+
+<!-- QR Code library: qrcode-generator (minimal) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
+// ── Generate QR code for QQ group ──
+(function(){
+  const qr = qrcode(0, 'M');
+  qr.addData('https://qm.qq.com/q/1004606342');
+  qr.make();
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const cellSize = 6;
+  const margin = 2;
+  const size = qr.getModuleCount();
+  canvas.width = canvas.height = (size + margin * 2) * cellSize;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#0e0e14';
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (qr.isDark(row, col)) {
+        ctx.fillRect((col + margin) * cellSize, (row + margin) * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+})();
+
+// ── Close modal on overlay click ──
+document.getElementById('qrModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+
+// ── Scroll reveal ──
 // ── Scroll reveal ──
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
