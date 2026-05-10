@@ -111,12 +111,10 @@ body::before{
   padding:16px 32px;display:flex;justify-content:space-between;align-items:center;
   background:rgba(8,8,12,.85);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
-  transform:translateY(-100%);transition:transform .3s;
 }
-.nav.show{transform:translateY(0)}
 .nav-logo{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);letter-spacing:.15em}
 .nav-links{display:flex;gap:28px}
-.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;letter-spacing:.15em;transition:color .3s}
+.nav-links a{color:var(--text);text-decoration:none;font-size:13px;letter-spacing:.15em;transition:color .3s}
 .nav-links a:hover{color:var(--accent)}
 
 /* ── Section ── */
@@ -309,6 +307,123 @@ body::before{
 }
 .tip-card p{font-size:13px;color:var(--dim);line-height:1.8}
 
+/* ── Lineup cards ── */
+.lineup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.lineup-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:28px;position:relative;overflow:hidden;
+}
+.lineup-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  opacity:0;transition:opacity .4s;
+}
+.lineup-card:hover::before{opacity:1}
+.lineup-card.tank::before{background:linear-gradient(90deg,var(--accent3),var(--accent))}
+.lineup-card.human::before{background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.lineup-card .badge{
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.2em;
+  padding:3px 10px;border-radius:3px;margin-bottom:16px;display:inline-block;
+}
+.lineup-card.tank .badge{background:rgba(74,138,212,.1);color:var(--accent3);border:1px solid rgba(74,138,212,.2)}
+.lineup-card.human .badge{background:rgba(192,72,32,.1);color:var(--accent2);border:1px solid rgba(192,72,32,.2)}
+.lineup-card h4{
+  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;
+  color:var(--accent);letter-spacing:.08em;margin-bottom:12px;
+}
+.lineup-card .members{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;
+}
+.lineup-card .members span{
+  font-size:12px;padding:3px 10px;border-radius:4px;
+  background:rgba(232,148,58,.06);color:var(--accent);
+  border:1px solid rgba(232,148,58,.12);
+}
+.lineup-card p{font-size:13px;color:var(--dim);line-height:1.8}
+
+/* ── Walkthrough ── */
+.walk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.walk-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:28px;position:relative;transition:border-color .4s;
+}
+.walk-card:hover{border-color:rgba(232,148,58,.2)}
+.walk-card .step-num{
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;
+  color:var(--accent);letter-spacing:.15em;margin-bottom:8px;
+}
+.walk-card h4{
+  font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;
+}
+.walk-card .highlight{
+  font-size:12px;color:var(--accent);margin-bottom:10px;
+  font-family:'Share Tech Mono',monospace;letter-spacing:.05em;
+}
+.walk-card p{font-size:13px;color:var(--dim);line-height:1.8}
+.walk-card .warn{
+  margin-top:10px;padding:8px 12px;border-radius:4px;font-size:12px;
+  background:rgba(192,72,32,.08);color:var(--accent2);
+  border-left:2px solid var(--accent2);
+}
+
+/* ── NG+ section ── */
+.ngplus-block{
+  max-width:900px;margin:0 auto;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:48px;position:relative;overflow:hidden;
+}
+.ngplus-block::before{
+  content:'';position:absolute;top:-40%;left:-15%;width:280px;height:280px;
+  background:radial-gradient(circle,rgba(232,148,58,.05),transparent 70%);
+  border-radius:50%;
+}
+.ngplus-block h3{
+  font-family:'Orbitron',sans-serif;font-size:clamp(18px,3vw,24px);
+  font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:20px;
+}
+.ngplus-block p{font-size:14px;color:var(--dim);line-height:2;margin-bottom:14px}
+.ngplus-block .checklist{list-style:none;margin:20px 0}
+.ngplus-block .checklist li{
+  padding:10px 0 10px 28px;position:relative;
+  font-size:14px;color:var(--text);line-height:1.7;
+  border-bottom:1px solid var(--border);
+}
+.ngplus-block .checklist li:last-child{border-bottom:none}
+.ngplus-block .checklist li::before{
+  content:'◆';position:absolute;left:0;color:var(--accent);font-size:10px;top:13px;
+}
+.ngplus-block .mat-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0;
+}
+.ngplus-block .mat-item{
+  padding:14px;border-radius:6px;
+  background:rgba(232,148,58,.04);border:1px solid rgba(232,148,58,.1);
+}
+.ngplus-block .mat-item .mat-name{
+  font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px;
+}
+.ngplus-block .mat-item .mat-src{font-size:12px;color:var(--dim)}
+
+/* ── Boss strategy ── */
+.boss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.boss-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:24px;transition:border-color .4s;
+}
+.boss-card:hover{border-color:rgba(192,72,32,.25)}
+.boss-card h4{
+  font-size:15px;font-weight:700;color:var(--accent2);margin-bottom:8px;
+}
+.boss-card .boss-hp{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--dim);letter-spacing:.1em;margin-bottom:10px;
+}
+.boss-card p{font-size:13px;color:var(--dim);line-height:1.8}
+.boss-card .weak{
+  display:inline-block;margin-top:8px;font-size:11px;padding:2px 8px;
+  border-radius:3px;background:rgba(80,184,112,.08);color:var(--accent4);
+  border:1px solid rgba(80,184,112,.15);
+}
+
 /* ── Footer ── */
 .footer{
   text-align:center;padding:60px 24px;
@@ -327,6 +442,11 @@ body::before{
   .nav-links{display:none}
   .hero-stats{gap:24px}
   .section{padding:60px 16px}
+  .lineup-grid{grid-template-columns:1fr}
+  .walk-grid{grid-template-columns:1fr}
+  .boss-grid{grid-template-columns:1fr}
+  .ngplus-block{padding:28px}
+  .ngplus-block .mat-grid{grid-template-columns:1fr}
 }
 
 /* ── Ambient particles ── */
@@ -356,17 +476,20 @@ body::before{
   <div class="nav-links">
     <a href="#lore">世界观</a>
     <a href="#features">核心玩法</a>
+    <a href="#lineup">阵容</a>
     <a href="#bounty">赏金首</a>
     <a href="#chars">角色</a>
     <a href="#map">地图</a>
+    <a href="#walk">流程</a>
     <a href="#tips">攻略</a>
+    <a href="#ngplus">二周目</a>
   </div>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
   <div class="hero-badge">FC经典重生</div>
-  <h1 class="glitch" data-text="重装机兵">重装机兵</h1>
+  <h1 class="glitch" data-text="重装机兵·虚拟">重装机兵·虚拟</h1>
   <div class="sub">METAL MAX · VIRTUAL</div>
   <p class="hero-desc">
     大破坏之后的废土世界，驾驶战车猎杀赏金首。<br>
@@ -540,6 +663,35 @@ body::before{
   </div>
 </section>
 
+<!-- Lineup -->
+<div class="divider"></div>
+<section class="section reveal" id="lineup">
+  <div class="section-header">
+    <div class="section-tag">// LINEUP</div>
+    <h2 class="section-title"><span>阵容</span>推荐</h2>
+  </div>
+  <div class="lineup-grid">
+    <div class="lineup-card tank">
+      <span class="badge">TANK COMBAT</span>
+      <h4>车战推荐阵容</h4>
+      <div class="members"><span>猎人</span><span>机械师</span><span>艺术家</span></div>
+      <p>猎人是核心输出，通过猎人之眼+狙击+电光火石打出爆炸伤害。机械师用烟尘炮弹致盲敌人、装甲恢复修复战车。艺术家吹军号加血、金粉加抗性、给boss上debuff。猎人乘的车多改C装置，其他车多改引擎。</p>
+    </div>
+    <div class="lineup-card human">
+      <span class="badge">HUMAN COMBAT</span>
+      <h4>人战推荐阵容</h4>
+      <div class="members"><span>战士</span><span>摔跤手</span><span>护士</span></div>
+      <p>经典人战阵容。战士丢手雷上debuff百分比掉血，摔跤手横岗+架势+台风（冷气3连击）/肘击（火焰4连击）三回合爆发一次，护士负责治疗。武器选攻击力高的，多连/范围武器不触发连击。</p>
+    </div>
+    <div class="lineup-card human">
+      <span class="badge">HUMAN COMBAT</span>
+      <h4>爆发流阵容</h4>
+      <div class="members"><span>猎人</span><span>艺术家</span><span>摔跤手</span></div>
+      <p>去商店买爆燃瓶、冷冻瓶打debuff代替战士手雷。艺术家金粉增加全体抗性，大吼配合摔跤手输出。辅助吹军号加血给boss上debuff，摔跤手3回合爆发一次，能快速结束战斗。缺点：车战中不能修理。</p>
+    </div>
+  </div>
+</section>
+
 <!-- Map -->
 <div class="divider"></div>
 <section class="section reveal" id="map">
@@ -597,6 +749,81 @@ body::before{
       <span class="tag">终点</span>
       <h4>亚德拉诺镇</h4>
       <p>最后的城镇。用勋章换道具、更新最强装备。诺亚基地就在这附近——最终决战的入口。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Walkthrough -->
+<div class="divider"></div>
+<section class="section reveal" id="walk">
+  <div class="section-header">
+    <div class="section-tag">// WALKTHROUGH</div>
+    <h2 class="section-title"><span>攻略</span>流程</h2>
+  </div>
+  <div class="walk-grid">
+    <div class="walk-card">
+      <div class="step-num">01 // 瑞特村</div>
+      <h4>冒险起点</h4>
+      <div class="highlight">搜刮家里 → 酒吧对话 → 修车工接任务 → 右边工厂拿1号车</div>
+      <p>搜刮家里（1楼右边房间需万能钥匙，箱子是宝石镜）。去酒吧对话每个人（二周目旅馆对话蕾娜）。对话修车工接刷10个废铁任务，做完去右边工厂拿1号车。买10个火箭礼花备用。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">02 // 燧火镇</div>
+      <h4>更新装备</h4>
+      <div class="highlight">更新装备 → 打鳄鱼 → 接楠木博士任务</div>
+      <p>出村向左再向上，途经商入秘营地。到燧火镇更新装备买传真。右上调查井下去打污染源鳄鱼（收丹妮娜再打）。左边大楼需完成楠木博士任务才能进。大楼右上方营地有波奇收。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">03 // 月牙湾镇</div>
+      <h4>吉普车钥匙</h4>
+      <div class="highlight">收丹妮娜 → 拿吉普车钥匙 → 蚂蚁洞穴</div>
+      <p>出镇向上过关卡遇丹妮娜，组队打败机器人后单挑，她加入。到月牙湾右边过桥向下进小屋拿吉普车钥匙。附近有金蚁（500G/只）。左边森林进蚂蚁洞穴打亚当蚁。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">04 // 克尔镇</div>
+      <h4>收机械师 · 拿吉普车</h4>
+      <div class="highlight">收机械师 → 扎亚斯拿车 → 巨炮硬仗</div>
+      <p>进镇收机械师。南边下楼打扎亚斯（3W血）拿吉普车，战士10级学投掷，机械师坐车用烟尘炮弹致盲。至此战队成型。附近刷怪升级快、打钱也快。巨炮是第一个硬仗。</p>
+      <div class="warn">极限过巨炮：主角15级出猎人之眼+装甲化，机械师烟尘炮弹致盲+装甲恢复，先集火打掉一个。</div>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">05 // 冶铁镇</div>
+      <h4>中期大本营</h4>
+      <div class="highlight">下水道拿4号车 → 蜈蚣刷C装置 → 打马歇尔 → 全员30级</div>
+      <p>停留最久的城镇。进镇先去下水道拿4号车（二周目蕾娜在下水道路口）。蜈蚣掉落C装置（一穴连射+1）必刷。马歇尔有难度，转职护士和摔跤手好打。打完调查电脑开栏杆。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">06 // 鬼魂大楼</div>
+      <h4>刷生物战车材料</h4>
+      <div class="highlight">异形出暴走细胞 → 怨灵出智灵 → 楼顶万能钥匙</div>
+      <p>8层废弃大楼。先去右下地下一层接任务。推油桶开正门。每层仔细开箱子柜子。8层中间做探鬼帽。先上楼顶打异形拿万能钥匙，再戴探鬼帽打怨灵。怨灵怕火和冰，有成佛道具很好打。</p>
+      <div class="warn">鬼楼所有BOSS掉落物都要刷出来！暴走细胞+智灵是制造生物战车的必备材料。</div>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">07 // 锈色少女</div>
+      <h4>异世界传送</h4>
+      <div class="highlight">加入欢乐神教 → 打教主 → 能量块开传送</div>
+      <p>搁浅的巨型邮轮。加入欢乐神教，完成任务后打教主（人战得能量块），坐电梯打绝对防御神话（车战）。用能量块开传送进异世界。能量块数量有限，进去一次打完再回来。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">08 // 利特港</div>
+      <h4>买船出海</h4>
+      <div class="highlight">打U鲨 → 买船 → 电波塔拿图纸 → 打德洛克</div>
+      <p>红发小女孩支线催人泪下（进港1小时内买花）。打U鲨后买船出海。电波塔4层有MK和PB图纸。打德洛克必须等暴走后再杀，否则不掉落碎片。附近有大鸟诸神黄昏。</p>
+      <div class="warn">德洛克暴走后光束和冷气效果好。必须等暴走再杀，否则无法合成终端系统！</div>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">09 // 罗德镇</div>
+      <h4>高达机甲</h4>
+      <div class="highlight">东南工厂造高达 → 东北工厂打恶霸 → 海域打3个BOSS</div>
+      <p>高达二选一制造。材料：高科技废铁（离子坦克）、金属外壳（沙漠3个战车BOSS）、能源核心（鬼楼负1楼守卫智能人）、杀戮系统（冥狱哨卡持刀守卫）。做完高达才能做激光炮。</p>
+    </div>
+    <div class="walk-card">
+      <div class="step-num">10 // 最终决战</div>
+      <h4>诺亚基地</h4>
+      <div class="highlight">收集24碎片 → 合成终端 → 4形态连战</div>
+      <p>用ID卡开大门。终端需全部赏金首碎片合成。BOSS每回合随机变化抗性，上BUFF磨血（火冰每回合掉1-2W），吃致盲。4连战中间不停，建议100级+。打完得退出按钮和未来芯片。</p>
+      <div class="warn">4形态连战中间不停！多存档。机械师注意修车，艺术家加闪避清小怪致盲。</div>
     </div>
   </div>
 </section>
@@ -675,6 +902,117 @@ body::before{
   </div>
 </section>
 
+<!-- Boss Strategy -->
+<div class="divider"></div>
+<section class="section reveal" id="boss">
+  <div class="section-header">
+    <div class="section-tag">// BOSS STRATEGY</div>
+    <h2 class="section-title"><span>BOSS</span>攻略</h2>
+  </div>
+  <div class="boss-grid">
+    <div class="boss-card">
+      <h4>诸神黄昏（大鸟）</h4>
+      <div class="boss-hp">碎片 ω · 终端系统必备</div>
+      <p>沙漠随机遇敌。必须等它变身觉醒后再杀，否则不掉落碎片，无法合成终端系统。沙漠附近有几率遇到。</p>
+      <span class="weak">等变身再杀</span>
+    </div>
+    <div class="boss-card">
+      <h4>德洛克</h4>
+      <div class="boss-hp">碎片 ψ · 电波塔右上方山洞</div>
+      <p>打掉一半血时暴走，提升攻击和抗性。暴走后光束和冷气效果好。必须等暴走后再杀，否则无掉落物。</p>
+      <span class="weak">等暴走再杀 · 光束/冷气</span>
+    </div>
+    <div class="boss-card">
+      <h4>怨灵</h4>
+      <div class="boss-hp">碎片 σ · 鬼魂大楼8层</div>
+      <p>怕火和冰。摔跤手"火焰歌舞伎"好用。有成佛道具时，打掉2-3W血后自动使用，一次性掉30W血。掉落怨结（圣临技能）。</p>
+      <span class="weak">怕火/冰 · 成佛秒杀</span>
+    </div>
+    <div class="boss-card">
+      <h4>蜈蚣</h4>
+      <div class="boss-hp">碎片 ι · 冶铁镇北边山洞</div>
+      <p>一层直接走到二层掉到最下层。主角巨像重炮+狙击+电光火石高输出。掉落C装置（一穴连射+1）必刷。</p>
+      <span class="weak">高输出速杀 · C装置必刷</span>
+    </div>
+    <div class="boss-card">
+      <h4>恶霸</h4>
+      <div class="boss-hp">罗德镇东北工厂</div>
+      <p>先打6个恶霸小弟（无法逃跑，小弟不断提升攻击力）。恶霸会"内在潜能"每回合自己掉血12%。上火焰或冷气BUFF掉血快。</p>
+      <span class="weak">火焰/冷气BUFF · 致盲</span>
+    </div>
+    <div class="boss-card">
+      <h4>诺亚（最终BOSS）</h4>
+      <div class="boss-hp">4形态连战 · 诺亚基地</div>
+      <p>每回合随机变化抗性。上BUFF耗血（火冰每回合1-2W可叠加）。4连战中间不停。半血会召唤小兵。建议100级+，装备BUFF副炮主炮。</p>
+      <span class="weak">吃致盲 · 上BUFF磨血</span>
+    </div>
+  </div>
+</section>
+
+<!-- NG+ -->
+<div class="divider"></div>
+<section class="section reveal" id="ngplus">
+  <div class="section-header">
+    <div class="section-tag">// NEW GAME+</div>
+    <h2 class="section-title"><span>二周目</span>攻略</h2>
+  </div>
+  <div class="ngplus-block">
+    <h3>进入二周目准备</h3>
+    <p>一周目结束后，使用退出按钮可选择进入二周目。进入前务必做好以下准备：</p>
+    <ul class="checklist">
+      <li>传真到瑞特村内下车</li>
+      <li>卸掉除高达之外的战车装备（高达在原来的位置）</li>
+      <li>人类和狗子装备可不脱，很快就能召集到队友</li>
+      <li>装备为原本穿戴装备</li>
+    </ul>
+
+    <h3 style="margin-top:32px">二周目新增内容</h3>
+    <p>二周目添加蕾娜全剧情任务链（详见蕾娜章节）。新增多个赏金首和强化材料来源：</p>
+
+    <div class="mat-grid">
+      <div class="mat-item">
+        <div class="mat-name">熔岩碳</div>
+        <div class="mat-src">罗德镇附近黄色声呐蛇 / 地铁隧道内土虫</div>
+      </div>
+      <div class="mat-item">
+        <div class="mat-name">深邃之石</div>
+        <div class="mat-src">冶铁镇上方抓吊 / 熔岩洞内石剑岩人</div>
+      </div>
+      <div class="mat-item">
+        <div class="mat-name">强化之水</div>
+        <div class="mat-src">海里红色多目鱼</div>
+      </div>
+      <div class="mat-item">
+        <div class="mat-name">精密电子零件</div>
+        <div class="mat-src">罗德镇东北工厂机械怪</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px">二周目赏金首位置</h3>
+    <ul class="checklist">
+      <li><strong>霸王花</strong> — 幕椮镇左边5棵树附近随机遇敌</li>
+      <li><strong>推土机</strong> — 冶铁镇上方附近随机遇敌</li>
+      <li><strong>屠夫</strong> — 淼迷镇上方地铁隧道第一个站台左上售货机附近</li>
+      <li><strong>深海之王</strong> — 冶铁镇上方山洞与小岛之间海域（需从利特港乘船绕行，等变身后再杀）</li>
+      <li><strong>龙王</strong> — 维修间右上河对岸（需从利特港乘船绕行，等变身后龙神再杀）</li>
+      <li><strong>金蚁王</strong> — 月牙湾左下5棵树附近随机遇敌</li>
+      <li><strong>冥界军舰</strong> — 鬼楼左侧沙漠碎石左侧（沙漠之舟左上方）</li>
+      <li><strong>美杜莎</strong> — 利特港左侧过桥向下明雷怪</li>
+      <li><strong>虚空之树</strong> — 克尔镇下方河边明雷怪</li>
+    </ul>
+
+    <h3 style="margin-top:32px">异世界BOSS</h3>
+    <ul class="checklist">
+      <li><strong>吉田研究所</strong> — 拿再生丸（必先拿，后面救红狼用）</li>
+      <li><strong>煤气叔泰德</strong> — 不吃致盲和猎人之眼，多备废铁，机械师战斗中修车。打完得玛利亚护符</li>
+      <li><strong>气象云</strong> — 各项抗性高，怕制空/光束/火焰，可致盲。建议90级+有高达再打</li>
+      <li><strong>果冻</strong> — 怕火焰/音波/鱼雷/光束，可致盲。半血出军舰雷龙</li>
+      <li><strong>杰克</strong> — 抗性极高，上BUFF辅助掉血</li>
+      <li><strong>三头龙</strong> — 只怕光束，掉落裁决卷轴。摔跤手带激光炮-连闪很爽</li>
+    </ul>
+  </div>
+</section>
+
 <!-- Footer -->
 <div class="divider"></div>
 <footer class="footer">
@@ -693,13 +1031,6 @@ const observer=new IntersectionObserver(entries=>{
 },{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-// ── Nav show on scroll ──
-let lastY=0;
-window.addEventListener('scroll',()=>{
-  const y=window.scrollY;
-  document.getElementById('nav').classList.toggle('show',y>600);
-  lastY=y;
-},{passive:true});
 
 // ── Particles ──
 (function(){
