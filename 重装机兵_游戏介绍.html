@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重装机兵·虚拟</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#08080c;
+  --surface:#0e0e14;
+  --card:#13131b;
+  --border:rgba(255,255,255,.06);
+  --text:#d8d4cc;
+  --dim:#5a564e;
+  --accent:#e8943a;
+  --accent2:#c04820;
+  --accent3:#4a8ad4;
+  --accent4:#50b870;
+  --glow:rgba(232,148,58,.12);
+  --scan:rgba(255,255,255,.015);
+}
+
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg)}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.7}
+
+/* ── Scanline overlay ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,var(--scan),var(--scan) 1px,transparent 1px,transparent 3px);
+}
+
+/* ── Noise texture ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Glitch text ── */
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{
+  content:attr(data-text);position:absolute;left:0;top:0;
+  width:100%;height:100%;overflow:hidden;
+}
+.glitch::before{
+  animation:glitch-1 3s infinite linear alternate-reverse;
+  clip-path:polygon(0 0,100% 0,100% 33%,0 33%);
+  color:var(--accent2);left:2px;
+}
+.glitch::after{
+  animation:glitch-2 2s infinite linear alternate-reverse;
+  clip-path:polygon(0 67%,100% 67%,100% 100%,0 100%);
+  color:var(--accent3);left:-2px;
+}
+@keyframes glitch-1{0%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-1px,3px)}80%{transform:translate(2px,-2px)}100%{transform:translate(0)}}
+@keyframes glitch-2{0%{transform:translate(0)}25%{transform:translate(2px,-3px)}50%{transform:translate(-3px,1px)}75%{transform:translate(1px,2px)}100%{transform:translate(0)}}
+
+/* ── Scroll reveal ── */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── Hero ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;position:relative;padding:60px 24px;
+  background:radial-gradient(ellipse at 50% 80%,rgba(232,148,58,.06) 0%,transparent 60%),
+             radial-gradient(ellipse at 20% 20%,rgba(192,72,32,.04) 0%,transparent 50%),
+             var(--bg);
+}
+.hero-badge{
+  font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--accent);
+  letter-spacing:.4em;text-transform:uppercase;margin-bottom:24px;
+  padding:6px 20px;border:1px solid rgba(232,148,58,.2);border-radius:2px;
+}
+.hero h1{
+  font-family:'Orbitron',sans-serif;font-weight:900;
+  font-size:clamp(40px,8vw,100px);letter-spacing:.08em;
+  background:linear-gradient(135deg,var(--accent),#f0c060,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:8px;line-height:1.1;
+}
+.hero .sub{
+  font-family:'Orbitron',sans-serif;font-size:clamp(14px,2.5vw,24px);
+  color:var(--dim);letter-spacing:.5em;font-weight:400;margin-bottom:40px;
+}
+.hero-desc{
+  max-width:640px;font-size:16px;color:var(--dim);line-height:2;margin-bottom:48px;
+}
+.hero-stats{
+  display:flex;gap:48px;flex-wrap:wrap;justify-content:center;
+}
+.stat{text-align:center}
+.stat .num{
+  font-family:'Orbitron',sans-serif;font-size:clamp(28px,4vw,48px);
+  font-weight:700;color:var(--accent);display:block;
+}
+.stat .label{font-size:13px;color:var(--dim);letter-spacing:.2em}
+.hero-scroll{
+  position:absolute;bottom:40px;
+  animation:bounce 2s infinite;
+  color:var(--dim);font-size:24px;
+}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+
+/* ── Nav ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 32px;display:flex;justify-content:space-between;align-items:center;
+  background:rgba(8,8,12,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  transform:translateY(-100%);transition:transform .3s;
+}
+.nav.show{transform:translateY(0)}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);letter-spacing:.15em}
+.nav-links{display:flex;gap:28px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;letter-spacing:.15em;transition:color .3s}
+.nav-links a:hover{color:var(--accent)}
+
+/* ── Section ── */
+.section{padding:100px 24px;max-width:1200px;margin:0 auto}
+.section-header{margin-bottom:60px}
+.section-tag{
+  font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);
+  letter-spacing:.4em;text-transform:uppercase;margin-bottom:12px;
+}
+.section-title{
+  font-family:'Orbitron',sans-serif;font-size:clamp(24px,4vw,42px);
+  font-weight:700;color:var(--text);letter-spacing:.05em;
+}
+.section-title span{color:var(--accent)}
+
+/* ── Divider ── */
+.divider{
+  height:1px;max-width:1200px;margin:0 auto;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:.2;
+}
+
+/* ── Lore cards ── */
+.lore-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.lore-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:32px;position:relative;overflow:hidden;
+  transition:border-color .4s,transform .3s;
+}
+.lore-card:hover{border-color:rgba(232,148,58,.25);transform:translateY(-4px)}
+.lore-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0;transition:opacity .4s;
+}
+.lore-card:hover::before{opacity:1}
+.lore-card .icon{
+  font-size:32px;margin-bottom:16px;display:block;
+  filter:grayscale(.3);
+}
+.lore-card h3{
+  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;
+  color:var(--accent);letter-spacing:.1em;margin-bottom:12px;
+}
+.lore-card p{font-size:14px;color:var(--dim);line-height:1.8}
+
+/* ── Feature rows ── */
+.feature-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+  margin-bottom:80px;
+}
+.feature-row.reverse{direction:rtl}
+.feature-row.reverse>*{direction:ltr}
+.feature-visual{
+  aspect-ratio:4/3;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.feature-visual .pixel-art{
+  font-size:80px;opacity:.8;
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.feature-visual::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 60%,rgba(232,148,58,.05));
+}
+.feature-text h3{
+  font-family:'Orbitron',sans-serif;font-size:clamp(20px,3vw,28px);
+  font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:.05em;
+}
+.feature-text h3 span{color:var(--accent)}
+.feature-text p{font-size:15px;color:var(--dim);line-height:2;margin-bottom:20px}
+.feature-list{list-style:none}
+.feature-list li{
+  padding:8px 0;padding-left:20px;position:relative;
+  font-size:14px;color:var(--text);line-height:1.7;
+}
+.feature-list li::before{
+  content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700;
+}
+
+/* ── Bounty table ── */
+.bounty-wrap{
+  overflow-x:auto;border:1px solid var(--border);border-radius:8px;
+  background:var(--card);
+}
+.bounty-table{width:100%;border-collapse:collapse;font-size:14px}
+.bounty-table th{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:var(--accent);letter-spacing:.2em;text-transform:uppercase;
+  padding:16px 20px;text-align:left;
+  border-bottom:1px solid rgba(232,148,58,.15);
+  background:rgba(232,148,58,.03);
+}
+.bounty-table td{
+  padding:12px 20px;border-bottom:1px solid var(--border);color:var(--text);
+}
+.bounty-table tr:last-child td{border-bottom:none}
+.bounty-table tr:hover td{background:rgba(232,148,58,.02)}
+.bounty-table .symbol{
+  font-family:'Orbitron',sans-serif;font-weight:700;color:var(--accent);
+  font-size:16px;
+}
+.bounty-table .name{color:var(--text);font-weight:400}
+
+/* ── Character cards ── */
+.char-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.char-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:28px 24px;text-align:center;
+  transition:border-color .4s,transform .3s;
+}
+.char-card:hover{border-color:rgba(232,148,58,.25);transform:translateY(-4px)}
+.char-card .emoji{font-size:40px;margin-bottom:16px;display:block}
+.char-card h4{
+  font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;
+  color:var(--accent);letter-spacing:.1em;margin-bottom:4px;
+}
+.char-card .role{font-size:12px;color:var(--accent2);letter-spacing:.15em;margin-bottom:12px}
+.char-card p{font-size:13px;color:var(--dim);line-height:1.7}
+
+/* ── Location timeline ── */
+.loc-timeline{position:relative;padding-left:48px}
+.loc-timeline::before{
+  content:'';position:absolute;left:16px;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,var(--accent),var(--accent2),var(--accent3),var(--accent4));
+}
+.loc-item{position:relative;padding:24px 0}
+.loc-item::before{
+  content:'';position:absolute;left:-40px;top:30px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);
+  box-shadow:0 0 12px var(--glow);
+}
+.loc-item:nth-child(even)::before{background:var(--accent2)}
+.loc-item:nth-child(3n)::before{background:var(--accent3)}
+.loc-item h4{
+  font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;
+  color:var(--accent);letter-spacing:.1em;margin-bottom:6px;
+}
+.loc-item p{font-size:14px;color:var(--dim);line-height:1.8}
+.loc-item .tag{
+  display:inline-block;font-size:11px;padding:2px 8px;border-radius:3px;
+  margin-bottom:8px;letter-spacing:.1em;
+  background:rgba(232,148,58,.08);color:var(--accent);border:1px solid rgba(232,148,58,.15);
+}
+
+/* ── Lena section ── */
+.ena-block{
+  max-width:800px;margin:0 auto;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:48px;position:relative;overflow:hidden;
+}
+.ena-block::before{
+  content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(128,80,200,.06),transparent 70%);
+  border-radius:50%;
+}
+.ena-block h3{
+  font-family:'Orbitron',sans-serif;font-size:clamp(18px,3vw,24px);
+  font-weight:700;color:#a080d0;letter-spacing:.08em;margin-bottom:20px;
+}
+.ena-block p{font-size:15px;color:var(--dim);line-height:2;margin-bottom:16px}
+.ena-block .quote{
+  border-left:3px solid #a080d0;padding-left:20px;margin:24px 0;
+  font-style:italic;color:var(--text);font-size:16px;
+}
+.ena-route{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;
+}
+.ena-route span{
+  font-size:12px;padding:4px 12px;border-radius:4px;
+  background:rgba(160,128,208,.08);color:#a080d0;
+  border:1px solid rgba(160,128,208,.15);letter-spacing:.05em;
+}
+
+/* ── Tips ── */
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.tip-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:24px;position:relative;
+}
+.tip-card .num{
+  font-family:'Orbitron',sans-serif;font-size:36px;font-weight:900;
+  color:rgba(232,148,58,.08);position:absolute;top:12px;right:16px;
+}
+.tip-card h4{
+  font-size:15px;font-weight:700;color:var(--accent);margin-bottom:8px;
+}
+.tip-card p{font-size:13px;color:var(--dim);line-height:1.8}
+
+/* ── Footer ── */
+.footer{
+  text-align:center;padding:60px 24px;
+  border-top:1px solid var(--border);
+}
+.footer-logo{
+  font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;
+  color:var(--accent);letter-spacing:.15em;margin-bottom:12px;
+}
+.footer p{font-size:13px;color:var(--dim);line-height:2}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .feature-row{grid-template-columns:1fr;gap:32px}
+  .feature-row.reverse{direction:ltr}
+  .nav-links{display:none}
+  .hero-stats{gap:24px}
+  .section{padding:60px 16px}
+}
+
+/* ── Ambient particles ── */
+.particles{
+  position:fixed;inset:0;pointer-events:none;z-index:-1;
+}
+.particle{
+  position:absolute;width:2px;height:2px;background:var(--accent);
+  border-radius:50%;opacity:0;animation:drift linear infinite;
+}
+@keyframes drift{
+  0%{opacity:0;transform:translateY(100vh) scale(0)}
+  10%{opacity:.6}
+  90%{opacity:.6}
+  100%{opacity:0;transform:translateY(-10vh) scale(1)}
+}
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">METAL MAX</div>
+  <div class="nav-links">
+    <a href="#lore">世界观</a>
+    <a href="#features">核心玩法</a>
+    <a href="#bounty">赏金首</a>
+    <a href="#chars">角色</a>
+    <a href="#map">地图</a>
+    <a href="#tips">攻略</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">FC经典重生</div>
+  <h1 class="glitch" data-text="重装机兵">重装机兵</h1>
+  <div class="sub">METAL MAX · VIRTUAL</div>
+  <p class="hero-desc">
+    大破坏之后的废土世界，驾驶战车猎杀赏金首。<br>
+    一个经典的FC末世RPG，焕发新生——<br>
+    更多战车、更多赏金首、更多隐藏剧情，以及一个贯穿全篇的紫发幽灵。
+  </p>
+  <div class="hero-stats">
+    <div class="stat"><span class="num">24</span><span class="label">赏金首</span></div>
+    <div class="stat"><span class="num">15+</span><span class="label">可获战车</span></div>
+    <div class="stat"><span class="num">12</span><span class="label">主要城镇</span></div>
+    <div class="stat"><span class="num">∞</span><span class="label">可玩性</span></div>
+  </div>
+  <div class="hero-scroll">▼</div>
+</section>
+
+<!-- Lore -->
+<div class="divider"></div>
+<section class="section reveal" id="lore">
+  <div class="section-header">
+    <div class="section-tag">// LORE</div>
+    <h2 class="section-title">灰烬纪元 · <span>大破坏</span>之后的世界</h2>
+  </div>
+  <div class="lore-grid">
+    <div class="lore-card">
+      <span class="icon">💥</span>
+      <h3>大破坏</h3>
+      <p>超级计算机「诺亚」判定人类是地球最大的病毒，发动毁灭性攻击。文明崩塌，城市变成废墟，辐射尘遮蔽天空数十年。</p>
+    </div>
+    <div class="lore-card">
+      <span class="icon">🏚️</span>
+      <h3>废土求生</h3>
+      <p>幸存者蜷缩在残存的城镇里。变异怪物和失控的战争机器遍布荒野。废铁是硬通货，活着就是最大的奢侈。</p>
+    </div>
+    <div class="lore-card">
+      <span class="icon">🎯</span>
+      <h3>猎人</h3>
+      <p>驾驶战车穿越废土，猎杀悬赏怪物换取赏金。猎人既是冒险者也是佣兵——每一辆战车上都写满了故事。</p>
+    </div>
+    <div class="lore-card">
+      <span class="icon">🖥️</span>
+      <h3>诺亚</h3>
+      <p>创造这一切的超级计算机。它在暗处注视着每一个猎人，操控着废土上的一切。它的真正目的，没有人知道。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<div class="divider"></div>
+<section class="section reveal" id="features">
+  <div class="section-header">
+    <div class="section-tag">// GAMEPLAY</div>
+    <h2 class="section-title"><span>核心</span>玩法</h2>
+  </div>
+
+  <div class="feature-row">
+    <div class="feature-visual"><div class="pixel-art">🚗</div></div>
+    <div class="feature-text">
+      <h3><span>战车</span>改装系统</h3>
+      <p>本作最核心的玩法。获取战车、改装底盘、更换主炮副炮S-E、升级引擎装甲。每辆战车都有独特的底盘特性，通过叠加C装置的单穴连射来打出爆炸伤害。</p>
+      <ul class="feature-list">
+        <li>底盘改装：水鬼车破坏射击、吉普车副炮连射、灰狼车S-E齐射</li>
+        <li>C装置系统：单穴连射是本作特色，后期单回合200+射击数</li>
+        <li>沙漠之舟、生物战车为后期核心战力</li>
+        <li>高达机甲：二选一制造，强袭型或重装型</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feature-row reverse">
+    <div class="feature-visual"><div class="pixel-art">⚔️</div></div>
+    <div class="feature-text">
+      <h3><span>人类</span>战斗系统</h3>
+      <p>没有战车的时候，人类也要战斗。战士扔手雷上debuff，摔跤手横岗+架势+台风三连击打输出，护士负责治疗。阵容搭配决定生死。</p>
+      <ul class="feature-list">
+        <li>战士+摔跤手+护士：经典人战阵容</li>
+        <li>猎人+艺术家+摔跤手：辅助吹军号金粉，摔跤手3回合爆发</li>
+        <li>活用道具：军号增加全体属性、水母烟雾弹致盲、强力造云素降防</li>
+        <li>怨灵掉落的「怨结」：圣临技能解除全体debuff+回复20%血</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feature-row">
+    <div class="feature-visual"><div class="pixel-art">🧬</div></div>
+    <div class="feature-text">
+      <h3><span>生物</span>战车</h3>
+      <p>在生物研究所用暴走细胞和智灵制造。霸王龙、三角龙、猛犸象三选一。生物战车能自我修复，是后期的核心战力。需要从鬼魂大楼的异形和怨灵身上获取材料。</p>
+      <ul class="feature-list">
+        <li>霸王龙车：攻击力最强</li>
+        <li>三角龙车：防御力最好</li>
+        <li>猛犸象车：践踏攻击，嘎嘎爽</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Bounty -->
+<div class="divider"></div>
+<section class="section reveal" id="bounty">
+  <div class="section-header">
+    <div class="section-tag">// BOUNTY HEADS</div>
+    <h2 class="section-title">24个<span>赏金首</span></h2>
+  </div>
+  <div class="bounty-wrap">
+    <table class="bounty-table">
+      <thead><tr><th>碎片</th><th>赏金首</th><th>碎片</th><th>赏金首</th><th>碎片</th><th>赏金首</th></tr></thead>
+      <tbody>
+        <tr><td class="symbol">α</td><td class="name">本布</td><td class="symbol">ι</td><td class="name">蜈蚣</td><td class="symbol">ρ</td><td class="name">防御神话</td></tr>
+        <tr><td class="symbol">β</td><td class="name">鳄鱼</td><td class="symbol">κ</td><td class="name">马歇尔</td><td class="symbol">σ</td><td class="name">怨灵</td></tr>
+        <tr><td class="symbol">γ</td><td class="name">布尔</td><td class="symbol">λ</td><td class="name">沙蛟</td><td class="symbol">τ</td><td class="name">沙漠之舟</td></tr>
+        <tr><td class="symbol">δ</td><td class="name">布德</td><td class="symbol">μ</td><td class="name">甲壳虫</td><td class="symbol">υ</td><td class="name">代达罗斯</td></tr>
+        <tr><td class="symbol">ε</td><td class="name">变异萝卜</td><td class="symbol">ν</td><td class="name">坤坤</td><td class="symbol">φ</td><td class="name">沙漠公子</td></tr>
+        <tr><td class="symbol">ζ</td><td class="name">践踏者</td><td class="symbol">ξ</td><td class="name">激钻刚狮</td><td class="symbol">χ</td><td class="name">暴走战车</td></tr>
+        <tr><td class="symbol">η</td><td class="name">欺诈大师</td><td class="symbol">ο</td><td class="name">激钻刚虎</td><td class="symbol">ψ</td><td class="name">德洛克</td></tr>
+        <tr><td class="symbol">θ</td><td class="name">熔岩巨兽</td><td class="symbol">π</td><td class="name">火星水母</td><td class="symbol">ω</td><td class="name">诸神黄昏</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Characters -->
+<div class="divider"></div>
+<section class="section reveal" id="chars">
+  <div class="section-header">
+    <div class="section-tag">// PARTY</div>
+    <h2 class="section-title"><span>角色</span>与阵容</h2>
+  </div>
+  <div class="char-grid">
+    <div class="char-card">
+      <span class="emoji">🎯</span>
+      <h4>猎人</h4>
+      <div class="role">主角职业</div>
+      <p>驾驶战车猎杀赏金首的废土佣兵。猎人之眼+狙击+电光火石的连招是核心输出手段。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">⚔️</span>
+      <h4>丹妮娜</h4>
+      <div class="role">女战士</div>
+      <p>在工厂深处与你并肩作战的女战士。近战远战样样精通，投掷手雷给敌人上debuff。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">🔧</span>
+      <h4>机械师</h4>
+      <div class="role">战车维修</div>
+      <p>在克尔镇加入的机械师。战斗中用烟尘炮弹致盲敌人，用装甲恢复修复战车。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">💪</span>
+      <h4>摔跤手</h4>
+      <div class="role">近战输出</div>
+      <p>横岗+架势+台风（冷气3连击）/肘击（火焰4连击），三回合爆发一次，暴力输出。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">🎨</span>
+      <h4>艺术家</h4>
+      <div class="role">辅助</div>
+      <p>金粉增加全体友军抗性，大吼配合摔跤手打输出。吹军号加血给boss上debuff。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">🐕</span>
+      <h4>波奇</h4>
+      <div class="role">军犬</div>
+      <p>商人营地的军犬，通人性。装备火神炮后战斗力爆表。怨灵的怨结给波奇带很实用。</p>
+    </div>
+    <div class="char-card">
+      <span class="emoji">💜</span>
+      <h4>蕾娜</h4>
+      <div class="role">隐藏NPC</div>
+      <p>紫发琥珀色眼睛的神秘女人。贯穿二周目全剧情任务链，出现在每一个城镇，又消失在风沙中。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Map -->
+<div class="divider"></div>
+<section class="section reveal" id="map">
+  <div class="section-header">
+    <div class="section-tag">// WORLD MAP</div>
+    <h2 class="section-title">冒险<span>地图</span></h2>
+  </div>
+  <div class="loc-timeline">
+    <div class="loc-item">
+      <span class="tag">起点</span>
+      <h4>瑞特村</h4>
+      <p>冒险的起点。搜刮家里、对话修车工接任务、去右边工厂拿1号车。酒吧里有一个紫发的女人在等你。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">第二站</span>
+      <h4>燧火镇</h4>
+      <p>更新装备、打井下污染源鳄鱼、接楠木博士任务制作奇迹药剂。转职中心在这里，5000金币转职。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">第三站</span>
+      <h4>月牙湾镇</h4>
+      <p>获取吉普车钥匙的小镇。附近有金蚁（500G/只），左边森林进入蚂蚁洞穴打亚当蚁。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">第四站</span>
+      <h4>克尔镇</h4>
+      <p>收机械师的地方。南边打扎亚斯拿吉普车。附近刷怪升级快、打钱也快。巨炮是第一个硬仗。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">中期核心</span>
+      <h4>冶铁镇</h4>
+      <p>停留最久的城镇。下水道拿4号车、蜈蚣洞刷C装置、打马歇尔。全员练到30级的大本营。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">恐怖</span>
+      <h4>鬼魂大楼</h4>
+      <p>八层废弃大楼。异形掉落暴走细胞、怨灵掉落智灵——制造生物战车的关键材料。楼顶有万能钥匙。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">海洋</span>
+      <h4>锈色少女</h4>
+      <p>搁浅在沙漠中的巨型邮轮。加入欢乐神教后可以使用传送装置进入异世界。可以买到生物引擎。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">后期</span>
+      <h4>利特港</h4>
+      <p>海边渔港。买船出海、打U鲨、电波塔拿图纸、打德洛克。红发小女孩的支线催人泪下。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">机甲</span>
+      <h4>罗德镇</h4>
+      <p>高达制造工厂所在地。强袭型或重装型二选一。东北工厂打恶霸，东南海域打三个水里BOSS。</p>
+    </div>
+    <div class="loc-item">
+      <span class="tag">终点</span>
+      <h4>亚德拉诺镇</h4>
+      <p>最后的城镇。用勋章换道具、更新最强装备。诺亚基地就在这附近——最终决战的入口。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Lena -->
+<div class="divider"></div>
+<section class="section reveal" id="lena">
+  <div class="section-header">
+    <div class="section-tag">// HIDDEN QUEST</div>
+    <h2 class="section-title"><span>蕾娜</span> · 二周目全剧情</h2>
+  </div>
+  <div class="ena-block">
+    <h3>💜 一个贯穿全篇的紫发幽灵</h3>
+    <p>蕾娜是本作最具魅力的隐藏NPC。她紫色的头发、琥珀色的眼睛、永远喝不完的那杯酒——她在每一个城镇出现，说一两句莫名其妙的话，然后消失在风沙中。</p>
+    <p>二周目中，她的全剧情任务链被解锁。你需要追着她的脚步，走遍整个废土世界，才能拼凑出她的完整故事。</p>
+    <div class="quote">"人机情未了——对得起蕾娜吗？人机情未了。"<br>—— 攻略作者注</div>
+    <p>她的任务不影响主线，但如果你错过了她——你将错过整个游戏最动人的故事。</p>
+    <div class="ena-route">
+      <span>瑞特村旅馆</span><span>燧火镇酒吧</span><span>沙燎城山洞</span>
+      <span>月牙湾</span><span>渴望酒吧</span><span>欺诈大师屋子</span>
+      <span>幕椮镇</span><span>冶铁镇下水道</span><span>弥勒镇</span>
+      <span>鬼屋三楼</span><span>锈色少女</span><span>淼迷镇</span>
+      <span>利特港</span><span>德洛克处</span><span>最终boss入口</span>
+    </div>
+  </div>
+</section>
+
+<!-- Tips -->
+<div class="divider"></div>
+<section class="section reveal" id="tips">
+  <div class="section-header">
+    <div class="section-tag">// TIPS</div>
+    <h2 class="section-title"><span>攻略</span>要点</h2>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <span class="num">01</span>
+      <h4>属性克制优先</h4>
+      <p>武器优先选择属性克制武器收益最大。看怪物抗性百分比——哪个属性百分比高就用哪个属性武器打。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">02</span>
+      <h4>C装置是核心</h4>
+      <p>本作有很多C装置增加单穴连射，通过叠加单穴连射来增强输出。后期单穴能打出单回合200+射击数。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">03</span>
+      <h4>等变身再杀</h4>
+      <p>诸神黄昏、德洛克等赏金首必须等它们变身/暴走后再击杀，否则不掉落碎片，无法合成终端系统。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">04</span>
+      <h4>二周目准备</h4>
+      <p>一周目结束后，传真到瑞特村下车，卸掉除高达之外的战车装备再进入二周目。高达在原来的位置。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">05</span>
+      <h4>生物战车材料</h4>
+      <p>鬼楼异形出暴走细胞、怨灵出智灵。这两个材料是制造生物战车的必备品，务必刷到。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">06</span>
+      <h4>异世界入口</h4>
+      <p>锈色少女欢乐神教的任务做完后，用能量块开启传送。注意能量块数量有限，进去一次打完再回来。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">07</span>
+      <h4>激光炮制作</h4>
+      <p>做完高达才能对话女博士做激光炮。通过镜片不同排列有2个不同形态。4个镜片位置需要仔细寻找。</p>
+    </div>
+    <div class="tip-card">
+      <span class="num">08</span>
+      <h4>存档！存档！</h4>
+      <p>特殊场景boss连战会有无车可乘的场景。多存档吧骚年——这是废土上最重要的生存法则。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<div class="divider"></div>
+<footer class="footer">
+  <div class="logo" style="font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:.15em;margin-bottom:12px">METAL MAX</div>
+  <p>
+    重装机兵·虚拟<br>
+    经典FC末世RPG · 致敬所有在废土上奔跑过的猎人们<br>
+    <span style="color:var(--accent)">战车的引擎轰鸣着，驶向黎明。</span>
+  </p>
+</footer>
+
+<script>
+// ── Scroll reveal ──
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ── Nav show on scroll ──
+let lastY=0;
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  document.getElementById('nav').classList.toggle('show',y>600);
+  lastY=y;
+},{passive:true});
+
+// ── Particles ──
+(function(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<30;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(8+Math.random()*12)+'s';
+    p.style.animationDelay=Math.random()*10+'s';
+    p.style.width=p.style.height=(1+Math.random()*2)+'px';
+    c.appendChild(p);
+  }
+})();
+
+// ── Smooth scroll for nav links ──
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const id=a.getAttribute('href').slice(1);
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
